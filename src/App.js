@@ -6,6 +6,7 @@ import Grille from './Grille.js';
 import React from 'react';
 import WebSocketComponent from './WebSocketComponent.js';
 import { useState, useEffect } from 'react';
+import Card from './Card';
 
 function App() {
 
@@ -30,6 +31,11 @@ function App() {
             <div className="App">
                 <header className="App-header">
                     <Grille socket={socket} update={update} />
+
+                    <div className="cards-container">
+                    <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" />
+                    <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" />
+                    </div>
                 </header>
             </div>
         );

@@ -58,9 +58,11 @@ function Grille(props) {
 
 
     return (
-        <table>
-            <thead>{grille}</thead>
-        </table>
+        <div id="grille">
+            <table>
+                <thead>{grille}</thead>
+            </table>
+        </div>
     );
 }
 
