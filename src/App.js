@@ -4,55 +4,44 @@ import './App.css';
 import Grille from './Grille.js';
 
 import React from 'react';
+import WebSocketComponent from './WebSocketComponent.js';
+import { useState, useEffect } from 'react';
 
-class WebSocketComponent extends React.Component {
-    constructor(props) {
-        super(props);
+function App() {
 
-        // Create a new WebSocket instance
-        this.websocket = new WebSocket('ws://localhost:8080');
+    const [socket, setSocket] = useState(null);
+    const [update, setUpdate] = useState({x: -1, y: -1});
 
-        // Set up event listeners for the WebSocket instance
-        this.websocket.addEventListener('open', event => {
-            console.log('WebSocket connection opened');
-        });
-
-        this.websocket.addEventListener('close', event => {
-            console.log('WebSocket connection closed');
-        });
-
-        this.websocket.addEventListener('message', event => {
-            console.log(`Received WebSocket message: ${event.data}`);
-        });
+    function updateGrilleCallback(message) {
+        console.log("App received message: " + message);
+        const x = parseInt(message.split(" ")[2]);
+        const y = parseInt(message.split(" ")[3]);
+        // console.log("x: " + x + ", y: " + y);
+        // console.log(message.split(" "));
+        setUpdate({x: x, y: y});
     }
+    useEffect(() => {
+        setSocket(new WebSocketComponent( updateGrilleCallback={updateGrilleCallback} ));
+    }, []);
 
-    // ...
 
-    render() {
+    if (socket) {
         return (
-            <div>
-                <h1>WebSocket Example</h1>
-                <p>Check the console logs for WebSocket events</p>
+            <div className="App">
+                <header className="App-header">
+                    <Grille socket={socket} update={update} />
+                </header>
+            </div>
+        );
+    } else {
+        return (
+            <div className="App">
+                <header className="App-header">
+                    <p>Chargement...</p>
+                </header>
             </div>
         );
     }
-
-    // Clean up the WebSocket instance when the component is unmounted
-    componentWillUnmount() {
-        this.websocket.close();
-    }
-}
-
-
-function App() {
-    return (
-        <div className="App">
-            <header className="App-header">
-                <WebSocketComponent />
-                <Grille />
-            </header>
-        </div>
-    );
 }
 
 export default App;

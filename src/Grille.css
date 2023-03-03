@@ -1,8 +1,36 @@
 table {
     border-collapse: collapse;
 }
+
 td {
     border: 1px solid black;
     width: 20px;
     height: 20px;
+}
+
+.cell {
+    background-color: white;
+    transition: background-color 0.2s;
+}
+
+.cell.clicked {
+    background-color: yellow;
+    animation: sparkle 0.5s ease-out forwards;
+}
+
+@keyframes sparkle {
+    0% {
+        background-color: yellow;
+        box-shadow: none;
+    }
+
+    50% {
+        background-color: white;
+        box-shadow: 0 0 5px 5px yellow;
+    }
+
+    100% {
+        background-color: yellow;
+        box-shadow: none;
+    }
 }
