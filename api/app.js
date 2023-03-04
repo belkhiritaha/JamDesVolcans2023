@@ -2,6 +2,11 @@ const express = require('express');
 const WebSocket = require('ws');
 const mongoose = require('mongoose');
 
+const clickTypes = {
+    0: [{x: 1, y: 1}, {x: 2, y: 1}, {x: 3, y: 1}, {x: 4, y: 1}],
+    1: [{x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 1, y: 4}]
+};
+
 const app = express();
 
 const clients = new Map();
@@ -15,6 +20,10 @@ function GenerateClientID() {
 mongoose.connect('mongodb://localhost/my_database', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch(error => {
+    console.log('Error connecting to MongoDB:', error.message);
 });
 
 // Define a schema for the Player model
@@ -39,7 +48,8 @@ const gameSchema = new mongoose.Schema({
 const Game = mongoose.model('Game', gameSchema);
 
 
-// Create a new WebSocket server
+// Create a new WebSocket server secure
+
 const wss = new WebSocket.Server({ port: 8080 });
 
 // Set up event listeners for the WebSocket server
@@ -160,9 +170,39 @@ wss.on('connection', ws => {
                     throw new Error('Player not found');
                 }
 
-                // Update the grille
-                game.grid[data.x][data.y] = 1;
+                // get the clickType and clickCard
+                const clickType = data.clickType;
+                const clickCard = data.clickCard;
+
+                const area = clickTypes[clickType][clickCard];
+                console.log("this is the area: ", area)
+
+                console.log("this is the game: ", game.grid)
+
+                // loop through the area
+                for (let i = 0; i < area.x; i++) {
+                    for (let j = 0; j < area.y; j++) {
+                        // check if all the squares are in the grid
+                        if (data.x + i < 0 || data.x + i > 19 || data.y + j < 0 || data.y + j > 19) {
+                            throw new Error('Invalid click');
+                        }
+                        else {
+                            // if player is player1
+                            if (player._id.toString() === game.player1) {
+                                game.grid[data.x + i][data.y + j] = 1;
+                            }
+                            if (player._id.toString() === game.player2) {
+                                game.grid[data.x + i][data.y + j] = 0;
+                            }
+                        }
+                    }
+                }
+                
+                // Update the game
+                game.markModified('grid');
                 await game.save();
+
+                console.log("this is the game: ", game.grid)
 
                 // get ids of all players in game
                 const playerIds = [game.player1, game.player2];
@@ -177,7 +217,7 @@ wss.on('connection', ws => {
                     // if not undefined
                     if (client !== undefined) {
                         if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode }));
+                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode, grid: game.grid }));
                         }
                     }
                 });

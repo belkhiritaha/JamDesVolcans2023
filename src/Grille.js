@@ -7,15 +7,19 @@ function Cell(props) {
     const [clicked, setClicked] = useState(false);
     const handleClick = () => {
         // console.log(props);
+
+        // CLICK TYPE 0 = build , 1 = destroy
+        // CLICK CARD 0 = nothing, BUILD: 1 = 2x2 , 3 = 4x2, DESTROY: 1 = 2x2, 2 = all adjacent
         const socketMessage = {
             type: "click",
+            clickType: 0,
+            clickCard: 1,
             x: props.x,
             y: props.y,
             playerId: props.playerId,
             gameCode: props.gameCode
         };
         props.socket.sendMessage(JSON.stringify(socketMessage));
-        setClicked(!clicked);
     };
 
     return (
@@ -54,10 +58,17 @@ function Grille(props) {
         console.log("Grille updated");
         // colorer la cellule
         console.log(props.update);
-        if (props.update.x >= 0 && props.update.y >= 0){
-            console.log(props.update);
-            const cell = document.getElementsByClassName("cell")[props.update.x * TAILLE + props.update.y];
-            cell.classList.add("clicked");
+        for (let i = 0; i < props.update.length; i++) {
+            for (let j = 0; j < props.update[i].length; j++) {
+                if (props.update[i][j] === 1) {
+                    const cell = document.getElementsByClassName("cell")[i * TAILLE + j];
+                    cell.classList.add("clicked");
+                }
+                if (props.update[i][j] === 0) {
+                    const cell = document.getElementsByClassName("cell")[i * TAILLE + j];
+                    cell.classList.remove("clicked");
+                }
+            }
         }
 
     }, [props.update]);

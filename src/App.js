@@ -6,21 +6,19 @@ import Grille from './Grille.js';
 import React from 'react';
 import WebSocketComponent from './WebSocketComponent.js';
 import { useState, useEffect } from 'react';
-import Card from './Card';
+import Shop from './Card';
 
 function App() {
 
     const [socket, setSocket] = useState(null);
-    const [update, setUpdate] = useState({x: -1, y: -1});
+    const [update, setUpdate] = useState([]);
     const [playerName, setPlayerName] = useState("");
     const [playerId, setPlayerId] = useState("");
     const [gameCode, setGameCode] = useState("");
     const [clientToken, setClientToken] = useState("");
 
     function updateGrilleCallback(message) {
-        const x = parseInt(message.x);
-        const y = parseInt(message.y);
-        setUpdate({x: x, y: y});
+        setUpdate(message.grid);
     }
 
     function updatePlayerCallback(message) {
@@ -70,19 +68,20 @@ function App() {
 
     if (socket) {
         return (
-            <div className="App">
-                <header className="App-header">
-                    <p>Bienvenue {playerName}!</p>
-                    <p>Code de la partie: {gameCode}</p>
-                    <p>Id du joueur: {playerId}</p>
-
-                    <Grille socket={socket} update={update} gameCode={gameCode} playerId={playerId} />
-
-                    <div className="cards-container">
-                        <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" />
-                        <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" />
+            <div className='all-container'>
+                <div className="App">
+                    <div className="infos">
+                        <p>Bienvenue {playerName}!</p>
+                        <p>Code de la partie: {gameCode}</p>
+                        <p>Id du joueur: {playerId}</p>
                     </div>
-                </header>
+                    <header className="App-header">
+
+                        <Grille socket={socket} update={update} gameCode={gameCode} playerId={playerId} />
+
+                        <Shop socket={socket} gameCode={gameCode} playerId={playerId} />
+                    </header>
+                </div>
             </div>
         );
     } else {
