@@ -20,7 +20,31 @@ class WebSocketComponent extends React.Component {
 
         this.websocket.addEventListener('message', event => {
             console.log(`Received WebSocket message: ${event.data}`);
-            props.updateGrilleCallback(event.data);
+
+            // Parse the message as JSON
+            const data = JSON.parse(event.data);
+
+            // Check if message is destined to this player
+
+
+            // Check if the message is a registration message
+            if (data.type === 'register') {
+                if (data.success === true) {
+                    console.log(props);
+                    console.log(`Registered with ID ${data.id}`);
+                    if (props.token === data.token) {
+                        props.updatePlayerCallback({name: data.name, id: data.id});
+                        console.log("nice")
+                    }
+                    console.log(props)
+                } else {
+                    console.error(`Failed to register player: ${data.error}`);
+                }
+            }
+
+            if (data.type === 'click') {
+                props.updateGrilleCallback(data);
+            }
         });
     }
 

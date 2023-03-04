@@ -7,7 +7,14 @@ function Cell(props) {
     const [clicked, setClicked] = useState(false);
     const handleClick = () => {
         // console.log(props);
-        props.socket.sendMessage("Clicked on " + props.x + ", " + props.y);
+        const socketMessage = {
+            type: "click",
+            x: props.x,
+            y: props.y,
+            playerId: props.playerId,
+            gameCode: props.gameCode
+        };
+        props.socket.sendMessage(JSON.stringify(socketMessage));
         setClicked(!clicked);
     };
 
@@ -21,6 +28,8 @@ function Cell(props) {
 
 function Grille(props) {
     const [grille, setGrille] = useState([]);
+    console.log("Grille rendered");
+    console.log(props);
 
     useEffect(() => {
         const generateGrille = () => {
@@ -29,7 +38,7 @@ function Grille(props) {
                 let ligne = [];
                 for (let j = 0; j < TAILLE; j++) {
                     ligne.push(
-                        <Cell socket={props.socket} key={j} x={i} y={j} />
+                        <Cell socket={props.socket} key={j} x={i} y={j} playerId={props.playerId} gameCode={props.gameCode} />
                     );
                 }
                 grille.push(<tr key={i}>{ligne}</tr>);
