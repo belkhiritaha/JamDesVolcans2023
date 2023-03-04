@@ -16,9 +16,40 @@ function App() {
     const [playerId, setPlayerId] = useState("");
     const [gameCode, setGameCode] = useState("");
     const [clientToken, setClientToken] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [counter, setCounter] = useState(1000);
+    const [gameStarted, setGameStarted] = useState(false);
 
     function updateGrilleCallback(message) {
         setUpdate(message.grid);
+    }
+
+    function updateStatusCallback(message) {
+        setErrorMessage(message);
+    }
+
+
+    function startCounterCallback() {
+        setCounter(3);
+        setTimeout(() => {
+            setCounter(2);
+        }, 1000);
+
+        setTimeout(() => {
+            setCounter(1);
+        }, 2000);
+
+        setTimeout(() => {
+            setCounter(0);
+        }, 3000);
+
+
+        setTimeout(() => {
+            setCounter(0);
+            console.log("Game started");
+            setGameStarted(true);
+        }, 4000);
+
     }
 
     function updatePlayerCallback(message) {
@@ -36,8 +67,7 @@ function App() {
         const token = Math.random().toString(36).substring(2);
         setClientToken(token);
 
-        setSocket(new WebSocketComponent({ updateGrilleCallback, updatePlayerCallback , token}));
-
+        setSocket(new WebSocketComponent({ updateGrilleCallback, updatePlayerCallback , token, updateStatusCallback, startCounterCallback }));
     }, []);
 
 
@@ -61,29 +91,54 @@ function App() {
                         socket.sendMessage(JSON.stringify(socketMessage));
 
                     }}>Valider</button>
+
+                    <p>{errorMessage}</p>
                 </header>
             </div>
         );
     }
 
     if (socket) {
-        return (
-            <div className='all-container'>
-                <div className="App">
-                    <div className="infos">
-                        <p>Bienvenue {playerName}!</p>
-                        <p>Code de la partie: {gameCode}</p>
-                        <p>Id du joueur: {playerId}</p>
+        if (gameStarted){
+            return (
+                <div className='all-container'>
+                    <div className="App">
+                        <div className="infos">
+                            <p>Bienvenue {playerName}!</p>
+                            <p>Code de la partie: {gameCode}</p>
+                            <p>Id du joueur: {playerId}</p>
+                        </div>
+                        <header className="App-header">
+    
+                            <Grille socket={socket} update={update} gameCode={gameCode} playerId={playerId} />
+    
+                            <Shop socket={socket} gameCode={gameCode} playerId={playerId} />
+                        </header>
                     </div>
-                    <header className="App-header">
-
-                        <Grille socket={socket} update={update} gameCode={gameCode} playerId={playerId} />
-
-                        <Shop socket={socket} gameCode={gameCode} playerId={playerId} />
-                    </header>
                 </div>
-            </div>
-        );
+            );
+        } else {
+            if (counter === 1000){
+                return (
+                    <div className="App">
+                        <header className="App-header">
+                            <p>Attente d'un autre joueur...</p>
+
+                            <p>Code de la partie: {gameCode}</p>
+                        </header>
+                    </div>
+                )
+            }
+            else {
+                return (
+                    <div className="App">
+                        <header className="App-header">
+                            <p>La partie commence dans {counter} secondes</p>
+                        </header>
+                    </div>
+                );
+            }
+        }
     } else {
         return (
             <div className="App">

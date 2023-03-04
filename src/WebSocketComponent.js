@@ -30,21 +30,28 @@ class WebSocketComponent extends React.Component {
             // Check if the message is a registration message
             if (data.type === 'register') {
                 if (data.success === true) {
-                    console.log(props);
+                    console.log(data)
                     console.log(`Registered with ID ${data.id}`);
                     if (props.token === data.token) {
                         props.updatePlayerCallback({name: data.name, id: data.id});
                         console.log("nice")
                     }
+
+                    if (data.isFull === true) {
+                        console.log("ifFull")
+                        props.startCounterCallback();
+                    }
                     console.log(props)
                 } else {
                     console.error(`Failed to register player: ${data.error}`);
+                    props.updateStatusCallback(data.error);
                 }
             }
 
             if (data.type === 'click') {
                 props.updateGrilleCallback(data);
             }
+
         });
     }
 

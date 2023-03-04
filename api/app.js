@@ -41,7 +41,9 @@ const gameSchema = new mongoose.Schema({
     player2: String,
     gameCode: String,
     grid: Array,
-    gameClock: Number
+    gameClock: Number,
+    isFull : Boolean,
+    startDate : Date
 });
 
 // Create a Game model based on the schema
@@ -96,7 +98,8 @@ wss.on('connection', ws => {
                         player2: "",
                         gameCode: data.gameCode,
                         gameClock: 0,
-                        grid: grid
+                        grid: grid,
+                        isFull: false
                     });
                     await newGame.save();
 
@@ -112,6 +115,8 @@ wss.on('connection', ws => {
                     console.log("this is the player1: ", game.player1)
                 } else {
                     game.player2 = id;
+                    game.isFull = true;
+                    game.startDate = new Date();
                 }
                 await game.save();
 
@@ -134,7 +139,7 @@ wss.on('connection', ws => {
                     // if not undefined
                     if (client !== undefined) {
                         if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: 'register', success: true, id, name: data.name, gameCode: data.gameCode, token: data.token }));
+                            client.send(JSON.stringify({ type: 'register', success: true, id, name: data.name, gameCode: data.gameCode, token: data.token, isFull: game.isFull }));
                         }
                     }
                 });
@@ -144,7 +149,7 @@ wss.on('connection', ws => {
                 // Send an error message back to the client
                 clients.forEach(client => {
                     if (client !== ws && client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({type: 'register', success: false, error: 'Failed to register player'}));
+                        client.send(JSON.stringify({type: 'register', success: false, error: err.message}));
                     }
                 });
             }
@@ -197,6 +202,17 @@ wss.on('connection', ws => {
                         }
                     }
                 }
+
+                // Check if the game has reached 1 minute
+                const now = new Date();
+                const timeDiff = now - game.startDate;
+                const timeDiffSeconds = timeDiff / 1000;
+                if (timeDiffSeconds > 60) {
+                    throw new Error('Game has ended');
+                }
+
+                game.gameClock = timeDiffSeconds;
+
                 
                 // Update the game
                 game.markModified('grid');
@@ -217,7 +233,7 @@ wss.on('connection', ws => {
                     // if not undefined
                     if (client !== undefined) {
                         if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode, grid: game.grid }));
+                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode, grid: game.grid , gameClock: game.gameClock}));
                         }
                     }
                 });
