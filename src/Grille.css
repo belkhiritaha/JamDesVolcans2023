@@ -17,31 +17,56 @@ table {
     transition: background-color 0.2s;
 }
 
-.cell.player1 {
-    background-color: red;
+.player1 {
+    background-color: hotpink;
+    animation: sparklep1 0.5s ease-out forwards;
+    /* box-shadow: 0 0 1px 1px hotpink; */
 }
 
-.cell.player2 {
-    background-color: green;
+.player2 {
+    background-color: limegreen;
+    animation: sparklep2 0.5s ease-out forwards;
+    /* box-shadow: 0 0 1px 1px limegreen; */
 }
 
-.cell.clicked {
-    animation: sparkle 0.5s ease-out forwards;
+.cell.clicked1 {
+    animation: sparklep1 0.5s ease-out forwards;
 }
 
-@keyframes sparkle {
+.cell.clicked2 {
+    animation: sparklep2 0.5s ease-out forwards;
+}
+
+@keyframes sparklep1 {
     0% {
-        background-color: yellow;
+        background-color: hotpink;
         box-shadow: none;
     }
 
     50% {
         background-color: white;
-        box-shadow: 0 0 5px 5px yellow;
+        box-shadow: 0 0 5px 5px hotpink;
     }
 
     100% {
-        background-color: yellow;
+        background-color: hotpink;
+        box-shadow: none;
+    }
+}
+
+@keyframes sparklep2 {
+    0% {
+        background-color: limegreen;
+        box-shadow: none;
+    }
+
+    50% {
+        background-color: white;
+        box-shadow: 0 0 5px 5px limegreen;
+    }
+
+    100% {
+        background-color: limegreen;
         box-shadow: none;
     }
 }

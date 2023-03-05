@@ -230,6 +230,9 @@ wss.on('connection', ws => {
 
                 game.gameClock = timeDiffSeconds;
 
+                // if updater is player1 if player is player1
+                const updater = player._id.toString() === game.player1 ? "player1" : "player2";
+
                 
                 // Update the game
                 game.markModified('grid');
@@ -253,7 +256,7 @@ wss.on('connection', ws => {
                     // if not undefined
                     if (client !== undefined) {
                         if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode, grid: game.grid , gameClock: game.gameClock, token: data.token, coins: player.coins }));
+                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode, grid: game.grid , gameClock: game.gameClock, token: data.token, coins: player.coins , updater: updater}));
                         }
                     }
                 });

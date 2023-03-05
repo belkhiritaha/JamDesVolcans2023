@@ -62,19 +62,17 @@ function Grille(props) {
             for (let j = 0; j < props.update[i].length; j++) {
                 if (props.update[i][j] === 1) {
                     const cell = document.getElementsByClassName("cell")[i * TAILLE + j];
-                    cell.classList.add("clicked");
-                    cell.classList.add("player1");
+                    cell.classList.remove("clicked2")
+                    cell.classList.add("clicked1");
                 }
-                if (props.update[i][j] === 1) {
+                if (props.update[i][j] === 2) {
                     const cell = document.getElementsByClassName("cell")[i * TAILLE + j];
-                    cell.classList.add("clicked");
-                    cell.classList.add("player2");
+                    cell.classList.add("clicked2");
+                    cell.classList.remove("clicked1");
                 }
                 if (props.update[i][j] === 0) {
                     const cell = document.getElementsByClassName("cell")[i * TAILLE + j];
-                    cell.classList.remove("clicked");
-                    cell.classList.remove("player1");
-                    cell.classList.remove("player2");
+                    cell.classList.remove("clicked1");
                 }
             }
         }

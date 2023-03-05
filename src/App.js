@@ -23,6 +23,7 @@ function App() {
     const [gameTimer, setGameTimer] = useState(120);
     const [frequency, setFrequency] = useState(0);
     const [coins, setCoins] = useState(0);
+    const [updater, setUpdater] = useState("");
 
     function updateCoinsCallback(message) {
         setCoins(message.coins);
@@ -40,6 +41,7 @@ function App() {
 
     function updateGrilleCallback(message) {
         setUpdate(message.grid);
+        setUpdater(message.updater);
     }
 
     function updateStatusCallback(message) {
@@ -150,7 +152,7 @@ function App() {
                             <header className="App-header">
                                 <p id="time">Temps restant: {gameTimer}</p>
 
-                                <Grille socket={socket} update={update} gameCode={gameCode} playerId={playerId} token={clientToken} />
+                                <Grille socket={socket} update={update} updater={updater} gameCode={gameCode} playerId={playerId} token={clientToken} />
         
                                 <Shop socket={socket} gameCode={gameCode} playerId={playerId} coins={coins} />
                             </header>
