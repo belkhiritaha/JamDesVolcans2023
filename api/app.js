@@ -58,7 +58,8 @@ mongoose.connect('mongodb://localhost/my_database', {
 const playerSchema = new mongoose.Schema({
     name: String,
     score: Number,
-    coins: Number
+    coins: Number,
+    card: Number
 });
 
 // Create a Player model based on the schema
@@ -184,6 +185,66 @@ wss.on('connection', ws => {
                         client.send(JSON.stringify({type: 'register', success: false, error: err.message}));
                     }
                 });
+            }
+        }
+
+        if(data.type === 'buy')
+        {
+            console.log("this is the gamecode: ", data.gameCode)
+            console.log("this is the id: ", data.playerId)
+            try {
+                // Find the game
+                const game = await Game.findOne({ gameCode: data.gameCode });
+                if (!game) {
+                    throw new Error('Game not found');
+                }
+
+                // Find the player
+                const player = await Player.findOne({ _id: data.playerId });
+                if (!player) {
+                    throw new Error('Player not found');
+                }
+
+                // get the type of  the card
+                const cardId = data.cardId;
+                const cardType = data.cardType;
+                const cardBought = clickType.cardType.filter(card => (card.id === cardId));
+
+                if(player.coins >= cardBought.cost)
+                {
+                    player.coins-=cardBought.cost;
+                    player.card = cardBought.id;
+                }
+                
+                // Update the game
+                game.markModified('grid');
+                await game.save();
+
+                // Update the player
+                await player.save();
+
+                console.log("this is the game: ", game.grid)
+
+                // get ids of all players in game
+                const playerIds = [game.player1, game.player2];
+
+                console.log("this is the playerIds: ", playerIds)
+                // get the keys values from playersHash where the value is in playerIds
+                const clientSockets = [playersHash.get(game.player1), playersHash.get(game.player2)];                
+
+                // Send a confirmation message back to the client
+                // loop through clientSockets
+                clientSockets.forEach(client => {
+                    // if not undefined
+                    if (client !== undefined) {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode, grid: game.grid , gameClock: game.gameClock, token: data.token, coins: player.coins , updater: updater}));
+                        }
+                    }
+                });
+
+            } catch (err) {
+                console.error(err);
             }
         }
 
