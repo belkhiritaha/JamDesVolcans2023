@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import './Card.css';
 
+const deckCards = [
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/0.png", title: "Construction 1 ", description: "", cost: "10", id: 0, type: 0 , area: {x: 1, y: 1}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/1.png", title: "Construction 2 ", description: "", cost: "4", id: 1, type: 0 , area: {x: 2, y: 2}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/2.png", title: "Construction 3 ", description: "", cost: "9", id: 2, type: 0 , area: {x: 3, y: 3}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/3.png", title: "Construction 4 ", description: "", cost: "16", id: 3, type: 0 , area: {x: 4, y: 4}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/4.png", title: "Construction 5 ", description: "", cost: "25", id: 4, type: 0 , area: {x: 5, y: 5}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/0.png",   title: "Destruction 1 ", description: "", cost: "10", id: 5, type: 1 , area: {x: 1, y: 1}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/1.png",   title: "Destruction 2 ", description: "", cost: "4", id: 6, type: 1 , area: {x: 2, y: 2}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/2.png",   title: "Destruction 3 ", description: "", cost: "9", id: 7, type: 1 , area: {x: 3, y: 3}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/3.png",   title: "Destruction 4 ", description: "", cost: "16", id: 8, type: 1 , area: {x: 4, y: 4}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/4.png",   title: "Destruction 5 ", description: "", cost: "25", id: 9, type: 1 , area: {x: 5, y: 5}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/dos.png",   title: "DECK", description: "", cost: "10", id: 10, type: 1 , area: {x: 6, y: 6}},
+]
+
 
 function Card(props) {
     const [isOpen, setIsOpen] = useState(false);
@@ -10,24 +24,26 @@ function Card(props) {
             type: "buy",
             playerId: props.playerId,
             gameCode: props.gameCode,
-            cardIdBought: props.player.card,
-            coinsleft: props.player.coins
+            cardIdBought: props.id
         };
+        console.log(socketMessage);
         props.socket.sendMessage(JSON.stringify(socketMessage));
         setIsOpen(!isOpen);
     };
 
+    console.log(props.id);
+
     return (
         <div className="card-container">
             <div className={`card ${isOpen ? 'open' : ''}`} onClick={handleClick}>
-                <img src={props.imageSrc} alt={props.imageAlt} />            
+                <img src={deckCards[props.id].imageSrc} alt="card" />           
                 <div className="card-content">
-                    <h2>{props.title}</h2>
+                    <h2>{deckCards[props.id].title}</h2>
                     {
                         props.title === "DECK" ? (
                             <p>PIOCHER UNE CARTE</p>
                         ) : (
-                            <p>COST: {props.cost}</p>
+                            <p>COST: {deckCards[props.id].cost}</p>
                         )
                     }
                 </div>
@@ -39,9 +55,6 @@ function Card(props) {
 function Shop(props) {
     const [isOpen, setIsOpen] = useState(false);
     const [cardsLeft, setCardsLeft] = useState(8);
-    const [firstCard, setFirstCard] = useState("");
-    const [secondCard, setSecondCard] = useState("");
-
 
     useEffect(() => {
         if (isOpen) {
@@ -73,9 +86,9 @@ function Shop(props) {
                 {isOpen ? (
                     <div className="shop-content">
                         <div className="cards-container" onClick={handleCardClick}>
-                            <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" title="DOUBLE TROUBLE" description="This card lets you build 2x2 blocks" cost="10" socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} />
-                            <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" title="TRIPLE RIPPLE" description="This card lets you build 3x3 blocks" cost="40" socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} />
-                            <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" title="DECK" description="This card lets you build 2x2 blocks" cost="10" socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} />
+                            <Card socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} id={props.deckCard1} />
+                            <Card socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} id={props.deckCard2} />
+                            <Card socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} id={10} />
                         </div>
 
                         <div className="coins-container">

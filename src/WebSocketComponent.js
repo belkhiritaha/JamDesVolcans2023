@@ -50,16 +50,24 @@ class WebSocketComponent extends React.Component {
 
             if (data.type === 'click') {
                 props.updateGrilleCallback(data);
-                console.log(data.token)
-                console.log(props.token)
+                // console.log(data.token)
+                // console.log(props.token)
                 if (props.token === data.token) {
                     props.updateCoinsCallback(data);
-                    console.log(data.coins)
+                    // console.log(data.coins)
                 }
             }
             
             if (data.type === 'timer') {
                 props.updateTimerCallback(data);
+            }
+
+            if (data.type === 'buy') {
+                props.updateCoinsCallback(data);
+                if (data.success === true) {
+                    props.updateDeckCallback(data);
+                    console.log(data)
+                }
             }
 
         });

@@ -16,24 +16,25 @@ const mongoose = require('mongoose');
 */
 
 
-const clickTypes = {
-    0: [{x: 1, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 3, y: 1}, {x: 0, y: 0}, {x: 1, y:1}],
-    1: [{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 10, y: 5}, {x: 1, y:1}]
-};
- 
-const deckCards = {
-    1: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 2 ", description: "", cost: "10", id: 0 },
-    2: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 3 ", description: "", cost: "10", id: 1 },
-    3: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 4 ", description: "", cost: "10", id: 2 },
-    0: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 1 ", description: "", cost: "10", id: 3 },
-    4: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 5 ", description: "", cost: "10", id: 4 },
-    5: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 1 ", description: "", cost: "10", id: 5 },
-    6: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 2 ", description: "", cost: "10", id: 6 },
-    7: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 3 ", description: "", cost: "10", id: 7 },
-    8: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 4 ", description: "", cost: "10", id: 8 },
-    9: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 5 ", description: "", cost: "10", id: 9 }
+const clickTypes = [
+    [{x: 1, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 3, y: 1}, {x: 0, y: 0}, {x: 1, y:1}],
+    [{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 10, y: 5}, {x: 1, y:1}]
+];
 
-};
+
+const deckCards = [
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/0.png", title: "Construction 1 ", description: "", cost: "10", id: 0, type: 0 , area: {x: 1, y: 1}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/1.png", title: "Construction 2 ", description: "", cost: "4", id: 1, type: 0 , area: {x: 2, y: 2}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/2.png", title: "Construction 3 ", description: "", cost: "9", id: 2, type: 0 , area: {x: 3, y: 3}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/3.png", title: "Construction 4 ", description: "", cost: "16", id: 3, type: 0 , area: {x: 4, y: 4}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/construction/4.png", title: "Construction 5 ", description: "", cost: "25", id: 4, type: 0 , area: {x: 5, y: 5}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/0.png",   title: "Destruction 1 ", description: "", cost: "10", id: 5, type: 1 , area: {x: 1, y: 1}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/1.png",   title: "Destruction 2 ", description: "", cost: "4", id: 6, type: 1 , area: {x: 2, y: 2}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/2.png",   title: "Destruction 3 ", description: "", cost: "9", id: 7, type: 1 , area: {x: 3, y: 3}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/3.png",   title: "Destruction 4 ", description: "", cost: "16", id: 8, type: 1 , area: {x: 4, y: 4}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/4.png",   title: "Destruction 5 ", description: "", cost: "25", id: 9, type: 1 , area: {x: 5, y: 5}},
+    {imageSrc: "http://jamdesvolcans:3000/cartes/dos.png",   title: "DECK", description: "", cost: "10", id: 10, type: 1 , area: {x: 6, y: 6}},
+]
 
 const app = express();
 
@@ -103,7 +104,8 @@ wss.on('connection', ws => {
                 const player = new Player({
                     name: data.name,
                     score: 0,
-                    coins: 0
+                    coins: 0,
+                    card: 5
                 });
                 await player.save();
 
@@ -153,21 +155,12 @@ wss.on('connection', ws => {
                 }
                 await game.save();
 
-                // Send a confirmation message back to the client
-                // clients.forEach(client => {
-                //     if (client !== ws && client.readyState === WebSocket.OPEN) {
-                //         client.send(JSON.stringify({ type: 'register', success: true, id, name: data.name, gameCode: data.gameCode }));
-                //     }
-                // });
-
                 const playerIds = [game.player1, game.player2];
 
                 console.log("this is the playerIds: ", playerIds)
                 // get the keys values from playersHash where the value is in playerIds
                 const clientSockets = [playersHash.get(game.player1), playersHash.get(game.player2)];                
 
-                // Send a confirmation message back to the client
-                // loop through clientSockets
                 clientSockets.forEach(client => {
                     // if not undefined
                     if (client !== undefined) {
@@ -190,8 +183,6 @@ wss.on('connection', ws => {
 
         if(data.type === 'buy')
         {
-            console.log("this is the gamecode: ", data.gameCode)
-            console.log("this is the id: ", data.playerId)
             try {
                 // Find the game
                 const game = await Game.findOne({ gameCode: data.gameCode });
@@ -204,44 +195,38 @@ wss.on('connection', ws => {
                 if (!player) {
                     throw new Error('Player not found');
                 }
-
-                // get the type of  the card
-                const cardId = data.cardId;
-                const cardType = data.cardType;
-                const cardBought = clickType.cardType.filter(card => (card.id === cardId));
-
-                if(player.coins >= cardBought.cost)
-                {
-                    player.coins-=cardBought.cost;
-                    player.card = cardBought.id;
-                }
                 
-                // Update the game
-                game.markModified('grid');
+                console.log("received: ", data)
+                // get the type of  the card
+                const cardId = data.cardIdBought;
+
+                const cardData = deckCards[cardId];
+
+                // check if the player has enough coins
+                if (player.coins < cardData.cost) {
+                    throw new Error('Not enough coins');
+                }
+
+                // update the player's coins
+                player.coins -= cardData.cost;
+
+                // update the player's card
+                player.card = cardId;
+
+                // generate two ints between 1 and 5
+                const x = Math.floor(Math.random() * 10) + 1;
+                const y = Math.floor(Math.random() * 10) + 1;
+
+                const deck = {card1: x, card2: y};
+                
                 await game.save();
 
-                // Update the player
                 await player.save();
 
-                console.log("this is the game: ", game.grid)
-
-                // get ids of all players in game
-                const playerIds = [game.player1, game.player2];
-
-                console.log("this is the playerIds: ", playerIds)
-                // get the keys values from playersHash where the value is in playerIds
-                const clientSockets = [playersHash.get(game.player1), playersHash.get(game.player2)];                
-
                 // Send a confirmation message back to the client
-                // loop through clientSockets
-                clientSockets.forEach(client => {
-                    // if not undefined
-                    if (client !== undefined) {
-                        if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode, grid: game.grid , gameClock: game.gameClock, token: data.token, coins: player.coins , updater: updater}));
-                        }
-                    }
-                });
+                playersHash.get(player._id.toString()).send(JSON.stringify({ type: 'buy', success: true, coins: player.coins, card: player.card, deck: deck }));
+
+                // clientId.send(JSON.stringify({ type: 'buy', success: true, coins: player.coins, card: player.card }));
 
             } catch (err) {
                 console.error(err);
@@ -249,8 +234,6 @@ wss.on('connection', ws => {
         }
 
         if (data.type === 'click') {
-            console.log("this is the gamecode: ", data.gameCode)
-            console.log("this is the id: ", data.playerId)
             try {
                 // Find the game
                 const game = await Game.findOne({ gameCode: data.gameCode });
@@ -268,14 +251,10 @@ wss.on('connection', ws => {
                     throw new Error('Player not found');
                 }
 
-                // get the clickType and clickCard
-                const clickType = data.clickType;
-                const clickCard = data.clickCard;
+                
+                const area = deckCards[player.card].area;
 
-                const area = clickTypes[clickType][clickCard];
                 console.log("this is the area: ", area)
-
-                console.log("this is the game: ", game.grid)
 
                 // loop through the area
                 for (let i = 0; i < area.x; i++) {
@@ -327,10 +306,10 @@ wss.on('connection', ws => {
                 game.markModified('grid');
                 await game.save();
 
+                player.card = 0;
+
                 // Update the player
                 await player.save();
-
-                console.log("this is the game: ", game.grid)
 
                 // get ids of all players in game
                 const playerIds = [game.player1, game.player2];

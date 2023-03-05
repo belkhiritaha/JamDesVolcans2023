@@ -8,6 +8,8 @@ import WebSocketComponent from './WebSocketComponent.js';
 import { useState, useEffect } from 'react';
 import Shop from './Card';
 import Background from './Background';
+import music from "./Mon_morceau.mp3";
+import click from "./click.mp3";
 
 function App() {
 
@@ -24,6 +26,14 @@ function App() {
     const [frequency, setFrequency] = useState(0);
     const [coins, setCoins] = useState(0);
     const [updater, setUpdater] = useState("");
+    const [deckCard1, setDeckCard1] = useState(1);
+    const [deckCard2, setDeckCard2] = useState(2);
+
+
+    function updateDeckCallback(message) {
+        setDeckCard1(message.deck.card1);
+        setDeckCard2(message.deck.card2);
+    }
 
     function updateCoinsCallback(message) {
         setCoins(message.coins);
@@ -40,8 +50,11 @@ function App() {
     }
 
     function updateGrilleCallback(message) {
+        const clickSound = new Audio(click);
+        clickSound.play();
         setUpdate(message.grid);
         setUpdater(message.updater);
+        
     }
 
     function updateStatusCallback(message) {
@@ -51,6 +64,11 @@ function App() {
 
     function startCounterCallback() {
         setCounter(3);
+
+        const audio = new Audio(music);
+        audio.loop = true;
+        audio.play();
+
         setTimeout(() => {
             setCounter(2);
         }, 1000);
@@ -89,7 +107,7 @@ function App() {
 
         console.log("Client token: " + token);
 
-        setSocket(new WebSocketComponent({ updateGrilleCallback, updatePlayerCallback , token, updateStatusCallback, startCounterCallback , updateTimerCallback, updateCoinsCallback}));
+        setSocket(new WebSocketComponent({ updateGrilleCallback, updatePlayerCallback , token, updateStatusCallback, startCounterCallback , updateTimerCallback, updateCoinsCallback, updateDeckCallback}));
     }, []);
 
     useEffect(() => {
@@ -154,7 +172,7 @@ function App() {
 
                                 <Grille socket={socket} update={update} updater={updater} gameCode={gameCode} playerId={playerId} token={clientToken} />
         
-                                <Shop socket={socket} gameCode={gameCode} playerId={playerId} coins={coins} />
+                                <Shop socket={socket} gameCode={gameCode} playerId={playerId} coins={coins} deckCard1={deckCard1} deckCard2={deckCard2} />
                             </header>
                         </div>
                     </div>
