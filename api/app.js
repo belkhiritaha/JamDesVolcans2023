@@ -2,22 +2,36 @@ const express = require('express');
 const WebSocket = require('ws');
 const mongoose = require('mongoose');
 
+/*
+1: carte const
+2: carte const
+3: carte const
+4: carte const
+5: carte const
+6: carte dest
+7: carte dest
+8: carte dest
+9: carte dest
+10: carte dest
+*/
+
+
 const clickTypes = {
-    0: [{x: 1, y: 1}, {x: 2, y: 1}, {x: 3, y: 1}, {x: 4, y: 1}],
-    1: [{x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 1, y: 4}]
+    0: [{x: 1, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 3, y: 1}, {x: 0, y: 0}, {x: 1, y:1}],
+    1: [{x: 1, y: 1}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 10, y: 5}, {x: 1, y:1}]
 };
  
 const deckCards = {
-    0: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 1 ", description: "", cost: "10" },
-    1: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 2 ", description: "", cost: "10" },
-    2: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 3 ", description: "", cost: "10" },
-    3: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 4 ", description: "", cost: "10" },
-    4: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 5 ", description: "", cost: "10" },
-    5: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 1 ", description: "", cost: "10" },
-    6: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 2 ", description: "", cost: "10" },
-    7: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 3 ", description: "", cost: "10" },
-    8: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 4 ", description: "", cost: "10" },
-    9: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 5 ", description: "", cost: "10" }
+    1: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 2 ", description: "", cost: "10", id: 0 },
+    2: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 3 ", description: "", cost: "10", id: 1 },
+    3: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 4 ", description: "", cost: "10", id: 2 },
+    0: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 1 ", description: "", cost: "10", id: 3 },
+    4: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 5 ", description: "", cost: "10", id: 4 },
+    5: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 1 ", description: "", cost: "10", id: 5 },
+    6: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 2 ", description: "", cost: "10", id: 6 },
+    7: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 3 ", description: "", cost: "10", id: 7 },
+    8: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 4 ", description: "", cost: "10", id: 8 },
+    9: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/",   title: "Destruction 5 ", description: "", cost: "10", id: 9 }
 
 };
 
