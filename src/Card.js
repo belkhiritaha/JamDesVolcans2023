@@ -8,11 +8,10 @@ function Card(props) {
     const handleClick = () => {
         const socketMessage = {
             type: "buy",
-            clickType: props.cost,
-            x: props.x,
-            y: props.y,
             playerId: props.playerId,
-            gameCode: props.gameCode
+            gameCode: props.gameCode,
+            cardIdBought: props.player.card,
+            coinsleft: props.player.coins
         };
         props.socket.sendMessage(JSON.stringify(socketMessage));
         setIsOpen(!isOpen);
