@@ -24,8 +24,13 @@ function Card(props) {
                 <img src={props.imageSrc} alt={props.imageAlt} />            
                 <div className="card-content">
                     <h2>{props.title}</h2>
-                    <p>{props.description}</p>
-                    <p>COST: {props.cost} coins</p>
+                    {
+                        props.title === "DECK" ? (
+                            <p>PIOCHER UNE CARTE</p>
+                        ) : (
+                            <p>COST: {props.cost}</p>
+                        )
+                    }
                 </div>
             </div>
         </div>
@@ -35,8 +40,8 @@ function Card(props) {
 function Shop(props) {
     const [isOpen, setIsOpen] = useState(false);
     const [cardsLeft, setCardsLeft] = useState(8);
-    const [firstCard, setFirstCard] = usestate("");
-    const [secondCard, setSecondCard] = usestate("");
+    const [firstCard, setFirstCard] = useState("");
+    const [secondCard, setSecondCard] = useState("");
 
 
     useEffect(() => {
@@ -65,16 +70,19 @@ function Shop(props) {
     return (
         <div className="shop-container">
             <div className={`exit ${isOpen ? 'open' : ''}`}>
-                <h2 onClick={handleClick}>EXIT</h2>
+                <h2 onClick={handleClick}>{isOpen ? 'CLOSE SHOP' : 'SHOP'}</h2>
                 {isOpen ? (
                     <div className="shop-content">
                         <div className="cards-container" onClick={handleCardClick}>
                             <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" title="DOUBLE TROUBLE" description="This card lets you build 2x2 blocks" cost="10" socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} />
                             <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" title="TRIPLE RIPPLE" description="This card lets you build 3x3 blocks" cost="40" socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} />
-                        </div>
-                        <div className="deck" onClick={handleCardClick}>
                             <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" title="DECK" description="This card lets you build 2x2 blocks" cost="10" socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} />
                         </div>
+
+                        <div className="coins-container">
+                            <h2>COINS: {props.coins}</h2>
+                        </div>
+
                     </div>
                 ) : null}
             </div>
