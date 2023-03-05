@@ -7,6 +7,20 @@ const clickTypes = {
     1: [{x: 1, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 1, y: 4}]
 };
 
+const deckCards = {
+    0: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 1 ", description: "", cost: "10" },
+    1: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 2 ", description: "", cost: "10" },
+    2: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 3 ", description: "", cost: "10" },
+    3: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 4 ", description: "", cost: "10" },
+    4: {imageSrc: "http://jamdesvolcans:3000/cartes/construction/", title: "Construction 5 ", description: "", cost: "10" },
+    5: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 1 ", description: "", cost: "10" },
+    6: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 2 ", description: "", cost: "10" },
+    7: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 3 ", description: "", cost: "10" },
+    8: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 4 ", description: "", cost: "10" },
+    9: {imageSrc: "http://jamdesvolcans:3000/cartes/destruction/", title: "Destruction 5 ", description: "", cost: "10" }
+
+};
+
 const app = express();
 
 const clients = new Map();
