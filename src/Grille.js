@@ -17,7 +17,8 @@ function Cell(props) {
             x: props.x,
             y: props.y,
             playerId: props.playerId,
-            gameCode: props.gameCode
+            gameCode: props.gameCode,
+            token: props.token
         };
         props.socket.sendMessage(JSON.stringify(socketMessage));
     };
@@ -32,8 +33,7 @@ function Cell(props) {
 
 function Grille(props) {
     const [grille, setGrille] = useState([]);
-    console.log("Grille rendered");
-    console.log(props);
+    // console.log("Grille rendered");
 
     useEffect(() => {
         const generateGrille = () => {
@@ -42,7 +42,7 @@ function Grille(props) {
                 let ligne = [];
                 for (let j = 0; j < TAILLE; j++) {
                     ligne.push(
-                        <Cell socket={props.socket} key={j} x={i} y={j} playerId={props.playerId} gameCode={props.gameCode} />
+                        <Cell socket={props.socket} key={j} x={i} y={j} playerId={props.playerId} gameCode={props.gameCode} token={props.token} />
                     );
                 }
                 grille.push(<tr key={i}>{ligne}</tr>);
@@ -55,18 +55,26 @@ function Grille(props) {
 
 
     useEffect(() => {
-        console.log("Grille updated");
+        // console.log("Grille updated");
         // colorer la cellule
-        console.log(props.update);
+        // console.log(props.update);
         for (let i = 0; i < props.update.length; i++) {
             for (let j = 0; j < props.update[i].length; j++) {
                 if (props.update[i][j] === 1) {
                     const cell = document.getElementsByClassName("cell")[i * TAILLE + j];
                     cell.classList.add("clicked");
+                    cell.classList.add("player1");
+                }
+                if (props.update[i][j] === 1) {
+                    const cell = document.getElementsByClassName("cell")[i * TAILLE + j];
+                    cell.classList.add("clicked");
+                    cell.classList.add("player2");
                 }
                 if (props.update[i][j] === 0) {
                     const cell = document.getElementsByClassName("cell")[i * TAILLE + j];
                     cell.classList.remove("clicked");
+                    cell.classList.remove("player1");
+                    cell.classList.remove("player2");
                 }
             }
         }

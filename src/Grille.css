@@ -1,20 +1,31 @@
 table {
-    border-collapse: collapse;
-}
+    border-collapse: separate;
+    border-spacing: 1%;
+  }
+  
+  td {
+    background-color: #f0ad4e;
+    border-radius: 10px;
+    text-align: center;
+    padding: 0.5em;
+  }
+  
 
-td {
-    border: 1px solid black;
-    width: 20px;
-    height: 20px;
-}
 
 .cell {
     background-color: white;
     transition: background-color 0.2s;
 }
 
+.cell.player1 {
+    background-color: red;
+}
+
+.cell.player2 {
+    background-color: green;
+}
+
 .cell.clicked {
-    background-color: yellow;
     animation: sparkle 0.5s ease-out forwards;
 }
 

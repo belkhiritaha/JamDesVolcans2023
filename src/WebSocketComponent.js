@@ -19,7 +19,7 @@ class WebSocketComponent extends React.Component {
         });
 
         this.websocket.addEventListener('message', event => {
-            console.log(`Received WebSocket message: ${event.data}`);
+            // console.log(`Received WebSocket message: ${event.data}`);
 
             // Parse the message as JSON
             const data = JSON.parse(event.data);
@@ -30,26 +30,36 @@ class WebSocketComponent extends React.Component {
             // Check if the message is a registration message
             if (data.type === 'register') {
                 if (data.success === true) {
-                    console.log(data)
+                    // console.log(data)
                     console.log(`Registered with ID ${data.id}`);
                     if (props.token === data.token) {
                         props.updatePlayerCallback({name: data.name, id: data.id});
-                        console.log("nice")
+                        // console.log("nice")
                     }
 
                     if (data.isFull === true) {
-                        console.log("ifFull")
+                        // console.log("ifFull")
                         props.startCounterCallback();
                     }
                     console.log(props)
                 } else {
-                    console.error(`Failed to register player: ${data.error}`);
+                    // console.error(`Failed to register player: ${data.error}`);
                     props.updateStatusCallback(data.error);
                 }
             }
 
             if (data.type === 'click') {
                 props.updateGrilleCallback(data);
+                console.log(data.token)
+                console.log(props.token)
+                if (props.token === data.token) {
+                    props.updateCoinsCallback(data);
+                    console.log(data.coins)
+                }
+            }
+            
+            if (data.type === 'timer') {
+                props.updateTimerCallback(data);
             }
 
         });

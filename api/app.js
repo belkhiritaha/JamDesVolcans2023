@@ -28,7 +28,9 @@ mongoose.connect('mongodb://localhost/my_database', {
 
 // Define a schema for the Player model
 const playerSchema = new mongoose.Schema({
-    name: String
+    name: String,
+    score: Number,
+    coins: Number
 });
 
 // Create a Player model based on the schema
@@ -71,6 +73,8 @@ wss.on('connection', ws => {
             try {
                 const player = new Player({
                     name: data.name,
+                    score: 0,
+                    coins: 0
                 });
                 await player.save();
 
@@ -194,20 +198,33 @@ wss.on('connection', ws => {
                         else {
                             // if player is player1
                             if (player._id.toString() === game.player1) {
-                                game.grid[data.x + i][data.y + j] = 1;
+                                if (game.grid[data.x + i][data.y + j] === 1) {
+                                    player.coins--;
+                                }
+                                else {
+                                    game.grid[data.x + i][data.y + j] = 1;
+                                    player.coins++;
+                                }
                             }
                             if (player._id.toString() === game.player2) {
-                                game.grid[data.x + i][data.y + j] = 0;
+                                if (game.grid[data.x + i][data.y + j] === 2) {
+                                    player.coins--;
+                                }
+                                else {
+                                    game.grid[data.x + i][data.y + j] = 2;
+                                    player.coins++;
+                                }
                             }
                         }
                     }
                 }
 
-                // Check if the game has reached 1 minute
+
+                // Check if the game has reached 2 minute
                 const now = new Date();
                 const timeDiff = now - game.startDate;
                 const timeDiffSeconds = timeDiff / 1000;
-                if (timeDiffSeconds > 60) {
+                if (timeDiffSeconds > 120) {
                     throw new Error('Game has ended');
                 }
 
@@ -217,6 +234,9 @@ wss.on('connection', ws => {
                 // Update the game
                 game.markModified('grid');
                 await game.save();
+
+                // Update the player
+                await player.save();
 
                 console.log("this is the game: ", game.grid)
 
@@ -233,20 +253,50 @@ wss.on('connection', ws => {
                     // if not undefined
                     if (client !== undefined) {
                         if (client.readyState === WebSocket.OPEN) {
-                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode, grid: game.grid , gameClock: game.gameClock}));
+                            client.send(JSON.stringify({ type: 'click', success: true, id: data.playerId, name: player.name, x: data.x, y: data.y , destinations: [clientId], gameCode: data.gameCode, grid: game.grid , gameClock: game.gameClock, token: data.token, coins: player.coins }));
                         }
                     }
                 });
 
             } catch (err) {
                 console.error(err);
+            }
+        }
 
-                // Send an error message back to the client
-                clients.forEach(client => {
-                    if (client !== ws && client.readyState === WebSocket.OPEN && client._id === data.playerId) {
-                        client.send(JSON.stringify({ type: 'click', success: false, error: 'Failed to click', destinations: [clientId] }));
+        if (data.type === 'timer') {
+            try {
+                const game = await Game.findOne({ gameCode: data.gameCode });
+                if (!game) {
+                    throw new Error('Game not found');
+                }
+
+                const nowTime = new Date();
+                const timeDiff = nowTime - game.startDate;
+                const timeDiffSeconds = timeDiff / 1000;
+                // To int
+                const timeDiffSecondsInt = Math.floor(timeDiffSeconds);
+
+                
+                // get ids of all players in game
+                const playerIds = [game.player1, game.player2];
+                
+                // get the keys values from playersHash where the value is in playerIds
+                const clientSockets = [playersHash.get(game.player1), playersHash.get(game.player2)];
+                
+                // Send a confirmation message back to the client
+                clientSockets.forEach(client => {
+                    if (client !== undefined) {
+                        if (client.readyState === WebSocket.OPEN) {
+                            // Check if the game has reached 2 minute
+                            if (timeDiffSeconds > 120) {
+                                client.send(JSON.stringify({ type: 'timer', success: false, error: 'Game has ended', destinations: [clientId] }));
+                            }
+                            client.send(JSON.stringify({ type: 'timer', success: true, gameClock: timeDiffSecondsInt, destinations: [clientId] }));
+                        }
                     }
                 });
+            }
+            catch (err) {
             }
         }
 

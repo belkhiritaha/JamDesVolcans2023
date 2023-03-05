@@ -7,6 +7,7 @@ import React from 'react';
 import WebSocketComponent from './WebSocketComponent.js';
 import { useState, useEffect } from 'react';
 import Shop from './Card';
+import Background from './Background';
 
 function App() {
 
@@ -19,6 +20,23 @@ function App() {
     const [errorMessage, setErrorMessage] = useState("");
     const [counter, setCounter] = useState(1000);
     const [gameStarted, setGameStarted] = useState(false);
+    const [gameTimer, setGameTimer] = useState(120);
+    const [frequency, setFrequency] = useState(0);
+    const [coins, setCoins] = useState(0);
+
+    function updateCoinsCallback(message) {
+        setCoins(message.coins);
+    }
+
+    function updateTimerCallback(message) {
+        if (message.success === true){
+            setGameTimer(120 - message.gameClock);
+        }
+        else {
+            const timerDiv = document.getElementById("time");
+            timerDiv.innerHTML = "La partie est terminée";
+        }
+    }
 
     function updateGrilleCallback(message) {
         setUpdate(message.grid);
@@ -67,85 +85,122 @@ function App() {
         const token = Math.random().toString(36).substring(2);
         setClientToken(token);
 
-        setSocket(new WebSocketComponent({ updateGrilleCallback, updatePlayerCallback , token, updateStatusCallback, startCounterCallback }));
+        console.log("Client token: " + token);
+
+        setSocket(new WebSocketComponent({ updateGrilleCallback, updatePlayerCallback , token, updateStatusCallback, startCounterCallback , updateTimerCallback, updateCoinsCallback}));
     }, []);
+
+    useEffect(() => {
+        if (gameStarted){
+            setInterval(() => {
+                const socketMessage = {
+                    type: "timer",
+                    gameCode: gameCode
+                };
+                socket.sendMessage(JSON.stringify(socketMessage));
+            }, 1000);
+
+        }
+    }, [gameStarted]);
 
 
     if (playerId === "") {
         return (
-            <div className="App">
-                <header className="App-header">
-                    <p>Entrez votre nom:</p>
-                    <input type="text" id="name" name="name" />
-                    <input type="text" id="gameCode" name="gameCode" />
-                    <button onClick={() => {
-                        const name = document.getElementById("name").value;
-                        const gameCode = document.getElementById("gameCode").value;
-                        setGameCode(gameCode);
-                        const socketMessage = {
-                            type: "register",
-                            name: name,
-                            gameCode: gameCode,
-                            token: clientToken
-                        };
-                        socket.sendMessage(JSON.stringify(socketMessage));
+            <>
+                <div className="App">
+                    <header className="App-header">
+                        <p>Entrez votre nom:</p>
+                        <input type="text" id="name" name="name" />
+                        <p>Entrez le code de la partie:</p>
+                        <input type="text" id="gameCode" name="gameCode" />
+                        <button onClick={() => {
+                            const name = document.getElementById("name").value;
+                            const gameCode = document.getElementById("gameCode").value;
+                            setGameCode(gameCode);
+                            const socketMessage = {
+                                type: "register",
+                                name: name,
+                                gameCode: gameCode,
+                                token: clientToken
+                            };
+                            socket.sendMessage(JSON.stringify(socketMessage));
 
-                    }}>Valider</button>
+                        }}>Valider</button>
 
-                    <p>{errorMessage}</p>
-                </header>
-            </div>
+                        <p>{errorMessage}</p>
+                    </header>
+                </div>
+
+                <Background  />
+            </>
+
         );
     }
 
     if (socket) {
         if (gameStarted){
             return (
-                <div className='all-container'>
-                    <div className="App">
-                        <div className="infos">
-                            <p>Bienvenue {playerName}!</p>
-                            <p>Code de la partie: {gameCode}</p>
-                            <p>Id du joueur: {playerId}</p>
+                <>
+                    <div className='all-container'>
+                        <div className="App">
+                            {/* <div className="infos">
+                                <p>Bienvenue {playerName}!</p>
+                                <p>Code de la partie: {gameCode}</p>
+                            </div> */}
+                            <header className="App-header">
+                                <p id="time">Temps restant: {gameTimer}</p>
+
+                                <Grille socket={socket} update={update} gameCode={gameCode} playerId={playerId} token={clientToken} />
+        
+                                <Shop socket={socket} gameCode={gameCode} playerId={playerId} coins={coins} />
+                            </header>
                         </div>
-                        <header className="App-header">
-    
-                            <Grille socket={socket} update={update} gameCode={gameCode} playerId={playerId} />
-    
-                            <Shop socket={socket} gameCode={gameCode} playerId={playerId} />
-                        </header>
                     </div>
-                </div>
+
+                    <Background  coins={coins} />
+                </>
             );
         } else {
             if (counter === 1000){
                 return (
-                    <div className="App">
-                        <header className="App-header">
-                            <p>Attente d'un autre joueur...</p>
+                    <>
+                        <div className="App">
+                            <header className="App-header">
+                                <p>Attente d'un autre joueur...</p>
 
-                            <p>Code de la partie: {gameCode}</p>
-                        </header>
-                    </div>
+                                <p>Code de la partie: {gameCode}</p>
+                            </header>
+                        </div>
+
+                        <Background  />
+                    </>
                 )
             }
             else {
                 return (
-                    <div className="App">
-                        <header className="App-header">
-                            <p>La partie commence dans {counter} secondes</p>
-                        </header>
-                    </div>
+                    <>
+                        <div className="App">
+                            <header className="App-header">
+                                <p>La partie commence dans {counter} secondes</p>
+                            </header>
+                        </div>
+
+                        <Background  />
+                    </>
                 );
             }
         }
     } else {
         return (
-            <div className="App">
-                <header className="App-header">
-                    <p>Chargement...</p>
-                </header>
-            </div>
+            <>
+                <div className="App">
+                    <header className="App-header">
+                        <p>Chargement...</p>
+                    </header>
+                </div>
+
+                <Background  />
+            </>
         );
     }
 }
