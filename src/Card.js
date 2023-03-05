@@ -32,9 +32,11 @@ function Card(props) {
     );
 }
 
-
 function Shop(props) {
     const [isOpen, setIsOpen] = useState(false);
+    const [cardsLeft, setCardsLeft] = useState(8);
+    const [firstCard, setFirstCard] = usestate("");
+    const [secondCard, setSecondCard] = usestate("");
 
 
     useEffect(() => {
@@ -55,15 +57,23 @@ function Shop(props) {
         setIsOpen(!isOpen);
     }
 
+    const handleCardClick = () => {
+        setIsOpen(!isOpen);
+        setCardsLeft(cardsLeft-1);
+    }
+
     return (
         <div className="shop-container">
-            <div className={`shop ${isOpen ? 'open' : ''}`} onClick={handleClick}>
-                <h2>SHOP</h2>
+            <div className={`exit ${isOpen ? 'open' : ''}`}>
+                <h2 onClick={handleClick}>EXIT</h2>
                 {isOpen ? (
                     <div className="shop-content">
-                        <div className="cards-container">
+                        <div className="cards-container" onClick={handleCardClick}>
                             <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" title="DOUBLE TROUBLE" description="This card lets you build 2x2 blocks" cost="10" socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} />
                             <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" title="TRIPLE RIPPLE" description="This card lets you build 3x3 blocks" cost="40" socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} />
+                        </div>
+                        <div className="deck" onClick={handleCardClick}>
+                            <Card imageSrc="https://picsum.photos/200/300" imageAlt="Image description" title="DECK" description="This card lets you build 2x2 blocks" cost="10" socket={props.socket} playerId={props.playerId} gameCode={props.gameCode} />
                         </div>
                     </div>
                 ) : null}
